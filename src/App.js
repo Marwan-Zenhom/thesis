@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { 
-  Plus, MessageSquare, ArrowUp, User, Bot, Menu, Sun, Moon, 
+  Plus, ArrowUp, User, Bot, Sun, Moon, 
   Edit3, Trash2, Search, Copy, Mic, MicOff, 
-  Download, Share2, Heart, Archive, Keyboard, Sidebar,
+  Heart, Archive, Sidebar,
   ThumbsUp, ThumbsDown, RotateCcw, X, Check, Upload, 
-  LogOut, Focus, Sparkles, FileText,
+  LogOut, Sparkles, FileText,
   Paperclip, LogIn, UserPlus, Eye, EyeOff,
-  ChevronRight, Globe, BookOpen, Code, Calculator, PenTool,
-  Target, Workflow, Brain, Lightbulb, Activity, MoreHorizontal
+  MoreHorizontal, Brain, Lightbulb, Activity, PenTool, Code, Workflow,
+  Square
 } from 'lucide-react';
 
 // --- Custom Hooks ---
@@ -33,30 +33,6 @@ const useLocalStorage = (key, initialValue) => {
   return [storedValue, setValue];
 };
 
-const useKeyboardShortcuts = (handlers) => {
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      const key = event.key.toLowerCase();
-      const combo = [];
-      
-      if (event.ctrlKey || event.metaKey) combo.push('cmd');
-      if (event.shiftKey) combo.push('shift');
-      if (event.altKey) combo.push('alt');
-      combo.push(key);
-      
-      const shortcut = combo.join('+');
-      
-      if (handlers[shortcut]) {
-        event.preventDefault();
-        handlers[shortcut]();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handlers]);
-};
-
 // --- Authentication Component ---
 const AuthModal = ({ isOpen, onClose, onAuthenticate }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -67,7 +43,6 @@ const AuthModal = ({ isOpen, onClose, onAuthenticate }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Simulate authentication
     const userData = {
       id: '1',
       name: isLogin ? 'John Doe' : name,
@@ -163,43 +138,6 @@ const AuthModal = ({ isOpen, onClose, onAuthenticate }) => {
             {isLogin ? 'Sign up' : 'Sign in'}
           </button>
         </div>
-      </div>
-    </div>
-  );
-};
-
-// --- Focus Search Component ---
-const FocusSearch = ({ focus, onFocusChange }) => {
-  const focusOptions = [
-    { id: 'all', label: 'All', icon: Globe, description: 'Search across all sources' },
-    { id: 'academic', label: 'Academic', icon: BookOpen, description: 'Academic papers and research' },
-    { id: 'code', label: 'Code', icon: Code, description: 'Programming and development' },
-    { id: 'math', label: 'Math', icon: Calculator, description: 'Mathematical concepts' },
-    { id: 'writing', label: 'Writing', icon: PenTool, description: 'Writing assistance' },
-    { id: 'business', label: 'Business', icon: Target, description: 'Business and finance' }
-  ];
-
-  return (
-    <div className="focus-search">
-      <div className="focus-label">
-        <Focus className="icon-sm" />
-        <span>Focus</span>
-      </div>
-      <div className="focus-options">
-        {focusOptions.map(option => {
-          const IconComponent = option.icon;
-          return (
-            <button
-              key={option.id}
-              className={`focus-option ${focus === option.id ? 'active' : ''}`}
-              onClick={() => onFocusChange(option.id)}
-              title={option.description}
-            >
-              <IconComponent className="icon-sm" />
-              <span>{option.label}</span>
-            </button>
-          );
-        })}
       </div>
     </div>
   );
@@ -415,7 +353,7 @@ const ConversationDropdown = ({ conversation, isOpen, onClose, onFavourite, onAr
   );
 };
 
-// --- Other Components (keep existing ones) ---
+// --- Utility Components ---
 const SkeletonLoader = () => (
   <div className="skeleton-container">
     <div className="skeleton skeleton-avatar"></div>
@@ -462,43 +400,6 @@ const MessageActions = ({ message, onCopy, onEdit, onReact, onRegenerate }) => (
   </div>
 );
 
-const KeyboardShortcutsModal = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
-
-  const shortcuts = [
-    { key: 'Cmd + K', description: 'Search conversations' },
-    { key: 'Cmd + N', description: 'New chat' },
-    { key: 'Cmd + Shift + L', description: 'Toggle light/dark mode' },
-    { key: 'Cmd + B', description: 'Toggle sidebar' },
-    { key: 'Cmd + U', description: 'Upload files' },
-    { key: 'Cmd + /', description: 'Show shortcuts' },
-    { key: 'Enter', description: 'Send message' },
-    { key: 'Shift + Enter', description: 'New line' },
-    { key: 'Esc', description: 'Close modals' }
-  ];
-
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Keyboard Shortcuts</h2>
-          <button onClick={onClose} className="modal-close">
-            <X className="icon" />
-          </button>
-        </div>
-        <div className="shortcuts-list">
-          {shortcuts.map((shortcut, index) => (
-            <div key={index} className="shortcut-item">
-              <kbd className="keyboard-key">{shortcut.key}</kbd>
-              <span>{shortcut.description}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // --- Main App Component ---
 export default function App() {
   // --- State Management ---
@@ -509,20 +410,17 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // For mobile sidebar
-  const [isSidebarHidden, setIsSidebarHidden] = useState(true); // Completely hide sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarHidden, setIsSidebarHidden] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isDarkMode, setIsDarkMode] = useLocalStorage('darkMode', true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [showShortcuts, setShowShortcuts] = useState(false);
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [toast, setToast] = useState(null);
-
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [editingText, setEditingText] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState([]);
-
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const [typingMessageId, setTypingMessageId] = useState(null);
@@ -532,6 +430,9 @@ export default function App() {
   const [renamingText, setRenamingText] = useState('');
   const [showArchivedModal, setShowArchivedModal] = useState(false);
   const [conversationFilter, setConversationFilter] = useState('all');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationTimeoutId, setGenerationTimeoutId] = useState(null);
+  const [typingTimeoutIds, setTypingTimeoutIds] = useState([]);
 
   const [pastConversations, setPastConversations] = useLocalStorage('conversations', [
     { id: '1', title: 'Onboarding Questions', messages: [], isFavourite: false, isArchived: false, createdAt: new Date().toISOString() },
@@ -544,14 +445,12 @@ export default function App() {
 
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
-  const searchInputRef = useRef(null);
   const chatContainerRef = useRef(null);
 
-  // --- Filtered conversations ---
+  // --- Memoized Values ---
   const filteredConversations = useMemo(() => {
-    let filtered = pastConversations.filter(conv => !conv.isArchived); // Exclude archived from main list
+    let filtered = pastConversations.filter(conv => !conv.isArchived);
     
-    // Apply conversation filter
     if (conversationFilter === 'favourites') {
       filtered = filtered.filter(conv => conv.isFavourite);
     }
@@ -570,7 +469,6 @@ export default function App() {
     });
   }, [pastConversations, searchQuery, conversationFilter]);
 
-  // --- Archived conversations ---
   const archivedConversations = useMemo(() => {
     let archived = pastConversations.filter(conv => conv.isArchived);
     
@@ -584,7 +482,6 @@ export default function App() {
     return archived.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [pastConversations, searchQuery]);
 
-  // --- Group conversations by date (ChatGPT style) ---
   const groupConversationsByDate = (conversations) => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -634,13 +531,11 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
-  // Handle window resize for mobile detection
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
       
-      // Auto-close sidebar on mobile when resizing to desktop
       if (!mobile && isSidebarOpen) {
         setIsSidebarOpen(false);
       }
@@ -650,13 +545,11 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, [isSidebarOpen]);
 
-  // Close mobile sidebar and dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isMobile && isSidebarOpen && !event.target.closest('.sidebar') && !event.target.closest('.sidebar-toggle')) {
         setIsSidebarOpen(false);
       }
-      // Close dropdown if clicking outside
       if (openDropdownId && !event.target.closest('.conversation-dropdown') && !event.target.closest('.dropdown-toggle')) {
         setOpenDropdownId(null);
       }
@@ -671,7 +564,6 @@ export default function App() {
     };
   }, [isMobile, isSidebarOpen, openDropdownId]);
 
-  // Handle scroll to show/hide scroll-to-bottom button
   useEffect(() => {
     const chatContainer = chatContainerRef.current;
     if (!chatContainer) return;
@@ -686,93 +578,213 @@ export default function App() {
     return () => chatContainer.removeEventListener('scroll', handleScroll);
   }, [messages.length]);
 
-  // --- Functions ---
+  // --- Essential Callbacks ---
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   }, []);
 
-  const handleNewChat = useCallback(() => {
+  const typeMessage = useCallback((messageId, content) => {
+    setTypingMessageId(messageId);
+    setDisplayedContent(prev => ({ ...prev, [messageId]: '' }));
+    
+    let currentIndex = 0;
+    const typingSpeed = 8;
+    const timeoutIds = [];
+    
+    const typeChar = () => {
+      if (currentIndex < content.length) {
+        setDisplayedContent(prev => ({
+          ...prev,
+          [messageId]: content.slice(0, currentIndex + 1)
+        }));
+        currentIndex++;
+        const timeoutId = setTimeout(typeChar, typingSpeed);
+        timeoutIds.push(timeoutId);
+        setTypingTimeoutIds(prev => [...prev, timeoutId]);
+      } else {
+        setTypingMessageId(null);
+        setDisplayedContent(prev => ({ ...prev, [messageId]: content }));
+        setTypingTimeoutIds(prev => prev.filter(id => !timeoutIds.includes(id)));
+        setIsGenerating(false);
+      }
+    };
+    
+    typeChar();
+  }, []);
+
+  const regenerateResponse = useCallback(async (messageId) => {
+    const messageIndex = messages.findIndex(msg => msg.id === messageId);
+    if (messageIndex === -1 || messages[messageIndex].role !== 'assistant') return;
+    
+    let userMessageIndex = messageIndex - 1;
+    while (userMessageIndex >= 0 && messages[userMessageIndex].role !== 'user') {
+      userMessageIndex--;
+    }
+    
+    if (userMessageIndex === -1) return;
+    
+    const userMessage = messages[userMessageIndex];
+    const messagesUpToUser = messages.slice(0, messageIndex);
+    setMessages(messagesUpToUser);
+    
+    setDisplayedContent(prev => {
+      const newContent = { ...prev };
+      delete newContent[messageId];
+      return newContent;
+    });
+    
+    setIsLoading(true);
+    setIsGenerating(true);
+    showToast('Regenerating response...');
+
+    try {
+      const timeoutId = setTimeout(() => {
+        const filesContext = userMessage.files ? ` I've also analyzed the ${userMessage.files.length} file(s) you uploaded: ${userMessage.files.map(f => f.name).join(', ')}.` : '';
+        
+        const variations = [
+          `I'd be happy to help with your question: "${userMessage.content}".${filesContext}
+
+As your onboarding assistant, I can provide guidance on:
+
+• Workplace policies and guidelines
+• Employee benefits and perks
+• IT systems and tool setup
+• Team structure and key contacts
+• Training programs and development
+• Facility information and resources
+
+What specific aspect would you like me to elaborate on?`,
+
+          `Thank you for asking: "${userMessage.content}".${filesContext}
+
+I'm here to support your onboarding journey! I can assist with:
+
+• Company handbook and procedures
+• Compensation and benefits overview
+• Technology setup and access
+• Organizational chart and introductions
+• Learning paths and skill development
+• Office amenities and logistics
+
+Is there a particular area you'd like to explore further?`,
+
+          `Great question: "${userMessage.content}".${filesContext}
+
+Let me help you navigate your onboarding! I have information about:
+
+• Corporate policies and compliance
+• Health and wellness benefits
+• System access and IT support
+• Department structure and reporting
+• Professional development opportunities
+• Campus facilities and services
+
+Which topic interests you most?`
+        ];
+        
+        const botContent = variations[Math.floor(Math.random() * variations.length)];
+        const newBotResponseId = Date.now().toString();
+        
+        const botResponse = {
+          id: newBotResponseId,
+          role: 'assistant',
+          content: botContent,
+          timestamp: new Date().toISOString(),
+          reaction: null,
+          isEdited: false
+        };
+        
+        const finalMessages = [...messagesUpToUser, botResponse];
+        setMessages(finalMessages);
+        
+        setTimeout(() => {
+          typeMessage(newBotResponseId, botContent);
+        }, 100);
+        
+        if (currentConversationId) {
+          setPastConversations(prev => prev.map(conv => 
+            conv.id === currentConversationId 
+              ? { ...conv, messages: finalMessages }
+              : conv
+          ));
+        }
+        
+        setIsLoading(false);
+        setGenerationTimeoutId(null);
+      }, 1000);
+      
+      setGenerationTimeoutId(timeoutId);
+
+    } catch (error) {
+      console.error("Failed to regenerate response:", error);
+      setIsLoading(false);
+      setIsGenerating(false);
+      setGenerationTimeoutId(null);
+      setTypingMessageId(null);
+      showToast('Failed to regenerate response', 'error');
+    }
+  }, [messages, currentConversationId, setPastConversations, typeMessage, showToast]);
+
+  // --- Helper Functions ---
+  const handleNewChat = () => {
     setMessages([]);
     setCurrentConversationId(null);
     setInput('');
     setUploadedFiles([]);
     inputRef.current?.focus();
-    // Close mobile sidebar after new chat
     if (isMobile) {
       setIsSidebarOpen(false);
     }
-  }, [isMobile]);
+  };
 
-  const handleAuthentication = useCallback((userData) => {
+  const handleAuthentication = (userData) => {
     setUser(userData);
-  }, [setUser]);
+  };
 
-  const handleLogout = useCallback(() => {
+  const handleLogout = () => {
     setUser(null);
     handleNewChat();
     showToast('Logged out successfully');
-  }, [setUser, handleNewChat, showToast]);
+  };
 
-  const handleConversationClick = useCallback((conversation) => {
-    // Prevent viewing archived conversations
+  const handleConversationClick = (conversation) => {
     if (conversation.isArchived) {
       showToast('This conversation is archived. Unarchive it first to view.', 'error');
       return;
     }
     setCurrentConversationId(conversation.id);
     setMessages(conversation.messages || []);
-    // Close mobile sidebar after selecting conversation
     if (isMobile) {
       setIsSidebarOpen(false);
     }
-  }, [isMobile, showToast]);
+  };
 
-  const toggleSidebar = useCallback(() => {
+  const toggleSidebar = () => {
     if (isMobile) {
       setIsSidebarOpen(!isSidebarOpen);
       if (!isSidebarOpen) {
-        setIsSidebarHidden(false); // Show sidebar on mobile when opened
+        setIsSidebarHidden(false);
       }
     } else {
-      // Toggle between completely hidden and visible
       setIsSidebarHidden(!isSidebarHidden);
       if (isSidebarHidden) {
-        setIsSidebarCollapsed(false); // When showing, make it expanded
+        setIsSidebarCollapsed(false);
       }
     }
-  }, [isMobile, isSidebarOpen, isSidebarHidden]);
+  };
 
-  const toggleTheme = useCallback(() => {
+  const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
-  }, [isDarkMode, setIsDarkMode]);
+  };
 
-  // --- Keyboard Shortcuts ---
-  useKeyboardShortcuts({
-    'cmd+k': () => {
-      setIsSearchFocused(true);
-      searchInputRef.current?.focus();
-    },
-    'cmd+n': handleNewChat,
-    'cmd+shift+l': () => setIsDarkMode(!isDarkMode),
-    'cmd+b': () => setIsSidebarCollapsed(!isSidebarCollapsed),
-    'cmd+u': () => setShowFileUpload(true),
-    'cmd+/': () => setShowShortcuts(true),
-    'escape': () => {
-      setShowShortcuts(false);
-      setIsSearchFocused(false);
-      setEditingMessageId(null);
-      setShowFileUpload(false);
-    }
-  });
-
-  const copyToClipboard = useCallback((text) => {
+  const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
       showToast('Copied to clipboard!');
     });
-  }, [showToast]);
+  };
 
-  const handleFileSelect = useCallback((files) => {
+  const handleFileSelect = (files) => {
     const newFiles = files.map(file => ({
       id: Date.now() + Math.random(),
       name: file.name,
@@ -783,61 +795,34 @@ export default function App() {
     setUploadedFiles(prev => [...prev, ...newFiles]);
     setShowFileUpload(false);
     showToast(`${files.length} file(s) uploaded successfully!`);
-  }, [showToast]);
+  };
 
-  const removeFile = useCallback((fileId) => {
+  const removeFile = (fileId) => {
     setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
-  }, []);
+  };
 
-
-
-  const scrollToBottom = useCallback(() => {
+  const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+  };
 
-  // Typing animation effect for assistant messages
-  const typeMessage = useCallback((messageId, content) => {
-    setTypingMessageId(messageId);
-    setDisplayedContent(prev => ({ ...prev, [messageId]: '' }));
-    
-    let currentIndex = 0;
-    const typingSpeed = 30; // milliseconds per character
-    
-    const typeChar = () => {
-      if (currentIndex < content.length) {
-        setDisplayedContent(prev => ({
-          ...prev,
-          [messageId]: content.slice(0, currentIndex + 1)
-        }));
-        currentIndex++;
-        setTimeout(typeChar, typingSpeed);
-      } else {
-        setTypingMessageId(null);
-        setDisplayedContent(prev => ({ ...prev, [messageId]: content }));
-      }
-    };
-    
-    typeChar();
-  }, []);
-
-  const handleMessageReaction = useCallback((messageId, reaction) => {
+  const handleMessageReaction = (messageId, reaction) => {
     setMessages(prev => prev.map(msg => 
       msg.id === messageId 
         ? { ...msg, reaction: msg.reaction === reaction ? null : reaction }
         : msg
     ));
     showToast(`Message ${reaction === 'like' ? 'liked' : 'disliked'}!`);
-  }, [showToast]);
+  };
 
-  const handleMessageEdit = useCallback((messageId) => {
+  const handleMessageEdit = (messageId) => {
     const message = messages.find(msg => msg.id === messageId);
     if (message) {
       setEditingMessageId(messageId);
       setEditingText(message.content);
     }
-  }, [messages]);
+  };
 
-  const saveMessageEdit = useCallback(() => {
+  const saveMessageEdit = () => {
     setMessages(prev => prev.map(msg => 
       msg.id === editingMessageId 
         ? { ...msg, content: editingText, isEdited: true }
@@ -846,9 +831,9 @@ export default function App() {
     setEditingMessageId(null);
     setEditingText('');
     showToast('Message updated!');
-  }, [editingMessageId, editingText, showToast]);
+  };
 
-  const toggleConversationFavourite = useCallback((convId, e) => {
+  const toggleConversationFavourite = (convId, e) => {
     e.stopPropagation();
     setPastConversations(prev => prev.map(conv => 
       conv.id === convId 
@@ -857,9 +842,9 @@ export default function App() {
     ));
     const conversation = pastConversations.find(c => c.id === convId);
     showToast(conversation?.isFavourite ? 'Removed from favourites!' : 'Added to favourites!');
-  }, [setPastConversations, showToast, pastConversations]);
+  };
 
-  const archiveConversation = useCallback((convId, e) => {
+  const archiveConversation = (convId, e) => {
     e.stopPropagation();
     setPastConversations(prev => prev.map(conv => 
       conv.id === convId 
@@ -870,35 +855,35 @@ export default function App() {
       handleNewChat();
     }
     showToast('Conversation archived!');
-  }, [setPastConversations, currentConversationId, handleNewChat, showToast]);
+  };
 
-  const deleteConversation = useCallback((convId, e) => {
+  const deleteConversation = (convId, e) => {
     e.stopPropagation();
     setPastConversations(prev => prev.filter(conv => conv.id !== convId));
     if (currentConversationId === convId) {
       handleNewChat();
     }
     showToast('Conversation deleted!');
-  }, [setPastConversations, currentConversationId, handleNewChat, showToast]);
+  };
 
-  const toggleDropdown = useCallback((convId, e) => {
+  const toggleDropdown = (convId, e) => {
     e.stopPropagation();
     setOpenDropdownId(openDropdownId === convId ? null : convId);
-  }, [openDropdownId]);
+  };
 
-  const closeDropdown = useCallback(() => {
+  const closeDropdown = () => {
     setOpenDropdownId(null);
-  }, []);
+  };
 
-  const startRenaming = useCallback((convId) => {
+  const startRenaming = (convId) => {
     const conversation = pastConversations.find(c => c.id === convId);
     if (conversation) {
       setRenamingConversationId(convId);
       setRenamingText(conversation.title);
     }
-  }, [pastConversations]);
+  };
 
-  const saveRename = useCallback(() => {
+  const saveRename = () => {
     if (renamingText.trim()) {
       setPastConversations(prev => prev.map(conv => 
         conv.id === renamingConversationId 
@@ -909,61 +894,40 @@ export default function App() {
     }
     setRenamingConversationId(null);
     setRenamingText('');
-  }, [renamingConversationId, renamingText, setPastConversations, showToast]);
+  };
 
-  const cancelRename = useCallback(() => {
+  const cancelRename = () => {
     setRenamingConversationId(null);
     setRenamingText('');
-  }, []);
+  };
 
-  const viewArchivedChat = useCallback((conversation) => {
+  const viewArchivedChat = (conversation) => {
     setCurrentConversationId(conversation.id);
     setMessages(conversation.messages || []);
     setShowArchivedModal(false);
-    // Close mobile sidebar after selecting conversation
     if (isMobile) {
       setIsSidebarOpen(false);
       setIsSidebarHidden(true);
     }
-  }, [isMobile]);
+  };
 
-  const unarchiveConversation = useCallback((convId) => {
+  const unarchiveConversation = (convId) => {
     setPastConversations(prev => prev.map(conv => 
       conv.id === convId 
         ? { ...conv, isArchived: false }
         : conv
     ));
     showToast('Conversation unarchived!');
-  }, [setPastConversations, showToast]);
+  };
 
-  const deleteArchivedConversation = useCallback((convId) => {
+  const deleteArchivedConversation = (convId) => {
     setPastConversations(prev => prev.filter(conv => conv.id !== convId));
     showToast('Conversation deleted!');
-  }, [setPastConversations, showToast]);
-
-  const exportConversation = useCallback(() => {
-    const conversation = pastConversations.find(c => c.id === currentConversationId);
-    if (conversation) {
-      const exportData = {
-        title: conversation.title,
-        messages: messages,
-        files: uploadedFiles.map(f => ({ name: f.name, size: f.size, type: f.type })),
-        exportedAt: new Date().toISOString()
-      };
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${conversation.title}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('Conversation exported!');
-    }
-  }, [pastConversations, currentConversationId, messages, uploadedFiles, showToast]);
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (e) e.preventDefault();
+    if (!input.trim() || isLoading || isGenerating) return;
 
     const messageId = Date.now().toString();
     const userMessage = { 
@@ -981,9 +945,10 @@ export default function App() {
     setInput('');
     setUploadedFiles([]);
     setIsLoading(true);
+    setIsGenerating(true);
 
     try {
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         const filesContext = userMessage.files ? ` I've also analyzed the ${userMessage.files.length} file(s) you uploaded: ${userMessage.files.map(f => f.name).join(', ')}.` : '';
         
         const botResponseId = Date.now().toString();
@@ -1012,7 +977,6 @@ Is there anything specific you'd like to know more about?`;
         const finalMessages = [...newMessages, botResponse];
         setMessages(finalMessages);
         
-        // Start typing animation for assistant message
         setTimeout(() => {
           typeMessage(botResponseId, botContent);
         }, 100);
@@ -1038,7 +1002,10 @@ Is there anything specific you'd like to know more about?`;
         }
         
         setIsLoading(false);
+        setGenerationTimeoutId(null);
       }, 1500);
+      
+      setGenerationTimeoutId(timeoutId);
 
     } catch (error) {
       console.error("Failed to fetch from n8n webhook:", error);
@@ -1052,6 +1019,11 @@ Is there anything specific you'd like to know more about?`;
       };
       setMessages(prev => [...prev, errorResponse]);
       setIsLoading(false);
+      setIsGenerating(false);
+      setGenerationTimeoutId(null);
+      setTypingMessageId(null);
+      typingTimeoutIds.forEach(timeoutId => clearTimeout(timeoutId));
+      setTypingTimeoutIds([]);
     }
   };
 
@@ -1071,7 +1043,52 @@ Is there anything specific you'd like to know more about?`;
     }
   };
 
-  // --- Render conversation item helper ---
+  const stopGeneration = () => {
+    if (generationTimeoutId) {
+      clearTimeout(generationTimeoutId);
+      setGenerationTimeoutId(null);
+    }
+    
+    typingTimeoutIds.forEach(timeoutId => clearTimeout(timeoutId));
+    setTypingTimeoutIds([]);
+    
+    setIsGenerating(false);
+    setIsLoading(false);
+    setTypingMessageId(null);
+    showToast('Generation stopped', 'error');
+  };
+
+  const getInputButton = () => {
+    if (isGenerating || typingMessageId) {
+      return {
+        icon: Square,
+        onClick: stopGeneration,
+        className: "stop-button",
+        title: "Stop generation",
+        disabled: false
+      };
+    } else if (input.trim()) {
+      return {
+        icon: ArrowUp,
+        onClick: (e) => {
+          e.preventDefault();
+          handleSubmit();
+        },
+        className: "send-button",
+        title: "Send message",
+        disabled: isLoading || isGenerating || typingMessageId
+      };
+    } else {
+      return {
+        icon: isVoiceMode ? MicOff : Mic,
+        onClick: toggleVoiceMode,
+        className: `voice-btn ${isVoiceMode ? 'active' : ''}`,
+        title: "Voice input",
+        disabled: isLoading || isGenerating || typingMessageId
+      };
+    }
+  };
+
   const renderConversationItem = (conv) => (
     <div 
       key={conv.id} 
@@ -1118,17 +1135,14 @@ Is there anything specific you'd like to know more about?`;
     </div>
   );
 
-  // --- Render Method ---
   return (
     <div className={`app-container ${isDarkMode ? 'dark' : 'light'}`}>
-      {/* Authentication Modal */}
       <AuthModal 
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)}
         onAuthenticate={handleAuthentication}
       />
 
-      {/* File Upload Modal */}
       {showFileUpload && (
         <div className="modal-overlay" onClick={() => setShowFileUpload(false)}>
           <div className="modal-content file-upload-modal" onClick={e => e.stopPropagation()}>
@@ -1143,7 +1157,6 @@ Is there anything specific you'd like to know more about?`;
         </div>
       )}
 
-      {/* Toast Notifications */}
       {toast && (
         <Toast
           message={toast.message}
@@ -1152,13 +1165,6 @@ Is there anything specific you'd like to know more about?`;
         />
       )}
 
-      {/* Keyboard Shortcuts Modal */}
-      <KeyboardShortcutsModal 
-        isOpen={showShortcuts} 
-        onClose={() => setShowShortcuts(false)} 
-      />
-
-      {/* Archived Conversations Modal */}
       <ArchivedConversationsModal
         isOpen={showArchivedModal}
         onClose={() => setShowArchivedModal(false)}
@@ -1168,7 +1174,6 @@ Is there anything specific you'd like to know more about?`;
         onDelete={deleteArchivedConversation}
       />
 
-      {/* Sidebar */}
       <div className={`sidebar ${isSidebarCollapsed ? 'collapsed' : ''} ${isSidebarOpen ? 'open' : ''} ${isSidebarHidden ? 'hidden' : ''}`}>
         <div className="sidebar-header">
           <button onClick={handleNewChat} className="new-chat-btn">
@@ -1183,7 +1188,6 @@ Is there anything specific you'd like to know more about?`;
               <div className={`search-wrapper ${isSearchFocused ? 'focused' : ''}`}>
                 <Search className="search-icon" />
                 <input
-                  ref={searchInputRef}
                   type="text"
                   placeholder="Search chats"
                   value={searchQuery}
@@ -1195,25 +1199,22 @@ Is there anything specific you'd like to know more about?`;
               </div>
             </div>
 
-            {!isSidebarCollapsed && (
-              <div className="conversation-filters">
-                <button
-                  className={`filter-btn ${conversationFilter === 'all' ? 'active' : ''}`}
-                  onClick={() => setConversationFilter('all')}
-                >
-                  All
-                </button>
-                <button
-                  className={`filter-btn ${conversationFilter === 'favourites' ? 'active' : ''}`}
-                  onClick={() => setConversationFilter('favourites')}
-                >
-                  Favourites
-                </button>
-              </div>
-            )}
+            <div className="conversation-filters">
+              <button
+                className={`filter-btn ${conversationFilter === 'all' ? 'active' : ''}`}
+                onClick={() => setConversationFilter('all')}
+              >
+                All
+              </button>
+              <button
+                className={`filter-btn ${conversationFilter === 'favourites' ? 'active' : ''}`}
+                onClick={() => setConversationFilter('favourites')}
+              >
+                Favourites
+              </button>
+            </div>
 
             <div className="conversation-list">
-              {/* Today */}
               {conversationGroups.today.length > 0 && (
                 <div className="conversation-group">
                   <div className="group-label">Today</div>
@@ -1221,7 +1222,6 @@ Is there anything specific you'd like to know more about?`;
                 </div>
               )}
 
-              {/* Yesterday */}
               {conversationGroups.yesterday.length > 0 && (
                 <div className="conversation-group">
                   <div className="group-label">Yesterday</div>
@@ -1229,7 +1229,6 @@ Is there anything specific you'd like to know more about?`;
                 </div>
               )}
 
-              {/* Previous 7 days */}
               {conversationGroups.lastWeek.length > 0 && (
                 <div className="conversation-group">
                   <div className="group-label">Previous 7 days</div>
@@ -1237,7 +1236,6 @@ Is there anything specific you'd like to know more about?`;
                 </div>
               )}
 
-              {/* Previous 30 days */}
               {conversationGroups.lastMonth.length > 0 && (
                 <div className="conversation-group">
                   <div className="group-label">Previous 30 days</div>
@@ -1245,15 +1243,12 @@ Is there anything specific you'd like to know more about?`;
                 </div>
               )}
 
-              {/* Older */}
               {conversationGroups.older.length > 0 && (
                 <div className="conversation-group">
                   <div className="group-label">Older</div>
                   {conversationGroups.older.map(renderConversationItem)}
                 </div>
               )}
-
-
             </div>
           </>
         )}
@@ -1295,9 +1290,7 @@ Is there anything specific you'd like to know more about?`;
         </div>
       </div>
 
-      {/* Main Chat Area */}
       <div className={`main-content ${isSidebarOpen ? 'sidebar-open' : ''} ${isSidebarHidden ? 'sidebar-hidden' : ''}`}>
-        {/* Header */}
         <div className="chat-header">
           <button onClick={toggleSidebar} className="sidebar-toggle">
             <Sidebar className="icon" />
@@ -1308,17 +1301,6 @@ Is there anything specific you'd like to know more about?`;
               : 'Onboarding Assistant'
             }
           </h1>
-          
-          {currentConversationId && (
-            <div className="header-actions">
-              <button onClick={exportConversation} className="header-btn" title="Export conversation">
-                <Download className="icon" />
-              </button>
-              <button className="header-btn" title="Share conversation">
-                <Share2 className="icon" />
-              </button>
-            </div>
-          )}
         </div>
 
         <div className="chat-container" ref={chatContainerRef}>
@@ -1397,7 +1379,6 @@ Is there anything specific you'd like to know more about?`;
                           )}
                         </div>
                         
-                        {/* File attachments */}
                         {msg.files && (
                           <div className="message-files">
                             {msg.files.map(file => (
@@ -1419,7 +1400,7 @@ Is there anything specific you'd like to know more about?`;
                             onCopy={copyToClipboard}
                             onEdit={handleMessageEdit}
                             onReact={handleMessageReaction}
-                            onRegenerate={() => showToast('Regenerating response...')}
+                            onRegenerate={regenerateResponse}
                           />
                         </div>
                       </>
@@ -1444,13 +1425,10 @@ Is there anything specific you'd like to know more about?`;
               <div ref={chatEndRef} />
             </div>
           )}
-          
         </div>
 
-        {/* Input Section */}
         <div className="input-section">
           <div className="input-container">
-            {/* Scroll to bottom button */}
             {showScrollToBottom && (
               <button 
                 onClick={scrollToBottom}
@@ -1460,7 +1438,7 @@ Is there anything specific you'd like to know more about?`;
                 <ArrowUp className="icon" style={{ transform: 'rotate(180deg)' }} />
               </button>
             )}
-            {/* Uploaded Files Display */}
+            
             {uploadedFiles.length > 0 && (
               <div className="uploaded-files">
                 {uploadedFiles.map(file => (
@@ -1496,27 +1474,28 @@ Is there anything specific you'd like to know more about?`;
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Message ChatGPT..."
+                  placeholder={isGenerating || typingMessageId ? "Generating response..." : "Message ChatGPT..."}
                   className="message-input"
                   rows={1}
+                  disabled={isGenerating || typingMessageId}
                 />
                 
                 <div className="input-actions-right">
-                  <button
-                    type="button"
-                    onClick={toggleVoiceMode}
-                    className={`voice-btn ${isVoiceMode ? 'active' : ''}`}
-                    title="Voice input"
-                  >
-                    {isVoiceMode ? <MicOff className="icon" /> : <Mic className="icon" />}
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isLoading || !input.trim()}
-                    className="send-button"
-                  >
-                    <ArrowUp className="icon" />
-                  </button>
+                  {(() => {
+                    const buttonConfig = getInputButton();
+                    const IconComponent = buttonConfig.icon;
+                    return (
+                      <button
+                        type={buttonConfig.className === "send-button" ? "submit" : "button"}
+                        onClick={buttonConfig.className === "send-button" ? undefined : buttonConfig.onClick}
+                        disabled={buttonConfig.disabled}
+                        className={buttonConfig.className}
+                        title={buttonConfig.title}
+                      >
+                        <IconComponent className="icon" />
+                      </button>
+                    );
+                  })()}
                 </div>
               </div>
             </form>

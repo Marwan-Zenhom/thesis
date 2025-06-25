@@ -1,70 +1,95 @@
-# Getting Started with Create React App
+# 🤖 Onboarding Chat Assistant
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+An AI-powered chat interface designed to help new employees navigate their onboarding process with company policies, benefits, procedures, and getting started information.
 
-## Available Scripts
+## ✨ Features
 
-In the project directory, you can run:
+- **Smart Chat Interface** - Dynamic input with mic/send/stop button states
+- **Real-time Typing Animation** - Fast character-by-character display
+- **Message Management** - Edit, react to, and regenerate responses
+- **Conversation History** - Organized by date with favorites and archive
+- **File Upload Support** - Upload and reference documents in chat
+- **Dark/Light Theme** - Toggle between themes with persistence
+- **Mobile Responsive** - Works seamlessly on desktop and mobile
+- **User Authentication** - Mock auth system for demonstration
 
-### `npm start`
+## 🚀 Quick Start
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```bash
+# Install dependencies
+npm install
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+# Start development server
+npm start
 
-### `npm test`
+# Build for production
+npm run build
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-### `npm run build`
+## 🏗️ Project Structure
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+src/
+├── App.js                 # Main application component
+├── index.js              # React entry point
+├── index.css             # Global styles import
+└── styles/               # Modular CSS files
+    ├── variables.css     # CSS custom properties
+    ├── base.css          # Base styles and resets
+    ├── layout.css        # Layout components
+    ├── sidebar.css       # Sidebar styles
+    ├── chat.css          # Chat interface
+    ├── input.css         # Input components
+    ├── modals.css        # Modal dialogs
+    ├── components.css    # UI components
+    ├── animations.css    # Animations and transitions
+    └── responsive.css    # Mobile responsive styles
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🎨 CSS Architecture
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The project uses a modular CSS approach with:
+- **CSS Custom Properties** for theming
+- **Component-based organization** for maintainability
+- **Mobile-first responsive design**
+- **Dark/light theme support**
 
-### `npm run eject`
+## 🛠️ Built With
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- **React 19** - UI framework
+- **Lucide React** - Icon library
+- **CSS Modules** - Styling approach
+- **Local Storage** - Data persistence
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 📱 Key Components
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- **AuthModal** - User authentication interface
+- **QuickTemplates** - Predefined conversation starters
+- **FileUpload** - Drag & drop file upload
+- **MessageActions** - Copy, edit, react, regenerate
+- **ConversationDropdown** - Conversation management
+- **ArchivedConversationsModal** - Archive management
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🔧 Configuration
 
-## Learn More
+The app includes sample conversations and can be easily configured for different:
+- Company policies
+- Onboarding procedures
+- Response templates
+- UI themes and styling
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🚀 Deployment
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+# Create production build
+npm run build
 
-### Code Splitting
+# Deploy to your hosting platform
+# (Vercel, Netlify, AWS, etc.)
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 📄 License
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is created for demonstration purposes.
